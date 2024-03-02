@@ -7,8 +7,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Plus, FolderPlus, FileUp, FolderUp } from "lucide-react";
+import { Plus, FolderUp } from "lucide-react";
 import MakeNewFolder from "./MakeNewFolder";
+import UploadFiles from "./UploadFiles";
 export default function UploadArea() {
   return (
     <div className="flex flex-row pt-6">
@@ -26,17 +27,9 @@ export default function UploadArea() {
         >
           <MakeNewFolder />
           <DropdownMenuSeparator />
-          <DropdownMenuItem className="flex flex-row gap-4 rounded-md" asChild>
-            <button
-              className="w-full"
-              onClick={(e) => {
-                e.preventDefault();
-              }}
-            >
-              <FileUp size={"20"} />
-              Upload File
-            </button>
-          </DropdownMenuItem>
+
+          <UploadFiles />
+
           <DropdownMenuItem className="flex flex-row gap-4 rounded-md" asChild>
             <button
               className="w-full"

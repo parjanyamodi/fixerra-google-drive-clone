@@ -7,10 +7,10 @@ export interface File {
     uuid: string;
     name: string;
     type: string;
-    dateModified: number;
+    lastModified: number;
     size: number;
-    dateCreated: number;
-    data: Blob;
+    dateCreated?: number;
+    data: Uint8Array;
 }
 
 export enum FileStores {
@@ -39,22 +39,81 @@ export const initDB = async (): Promise<boolean> => {
 }
 
 export const addFile = async (fileData: File) => {
+    console.log(fileData);
     return new Promise((resolve, reject) => {
-        const transaction = db.transaction([FileStores.Files], "readwrite");
-        const store = transaction.objectStore(FileStores.Files);
-        const request = store.add(fileData);
+        request = indexedDB.open("fileDB", version);
         request.onsuccess = (event) => {
-            toast.success("File added successfully", {
-                description: fileData.name,
+            db = request.result;
+            const transaction = db.transaction("files", "readwrite");
+            const store = transaction.objectStore("files");
+            const response = store.add(fileData);
+            response.onsuccess = (event) => {
 
-            });
-            resolve(true);
+                toast.success("File added successfully", {
+                    description: fileData.name,
+
+                });
+                resolve(true);
+
+            }
         };
         request.onerror = (event) => {
             toast.error("Error adding file", {
                 description: fileData.name,
             });
             reject(false);
+        };
+    });
+}
+
+export const getFile = async (uuid: string): Promise<File> => {
+    request = indexedDB.open("fileDB", version);
+    return new Promise((resolve, reject) => {
+        request.onsuccess = (event) => {
+            try {
+
+                db = request.result;
+                const transaction = db.transaction("files", "readonly");
+                const store = transaction.objectStore("files");
+                const response = store.get(uuid);
+                response.onsuccess = (event) => {
+                    toast.success("Download will start shortly")
+                    resolve(response.result);
+                }
+            }
+            catch (e) {
+            }
+        };
+        request.onerror = (event) => {
+            toast.error("Error getting file", {
+                description: uuid,
+            });
+            reject(null);
+        };
+    });
+}
+
+export const getFiles = async (): Promise<File[]> => {
+    return new Promise((resolve, reject) => {
+        request = indexedDB.open("fileDB", version);
+        request.onsuccess = (event) => {
+            try {
+                db = request.result;
+                const transaction = db.transaction("files", "readonly");
+                const store = transaction.objectStore("files");
+                const response = store.getAll();
+                response.onsuccess = (event) => {
+                    resolve(response.result);
+                }
+            }
+            catch (e) {
+            }
+        };
+        request.onerror = (event) => {
+            toast.error("Error getting files", {
+                description: request.error?.message,
+            });
+            reject([]);
         };
     });
 }
