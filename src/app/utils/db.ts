@@ -21,6 +21,8 @@ export const initDB = async (): Promise<boolean> => {
     return new Promise((resolve, reject) => {
         request = indexedDB.open("fileDB", version);
         request.onupgradeneeded = (event) => {
+            db = request.result;
+
             if (!db.objectStoreNames.contains(FileStores.Files)) {
                 console.log('Creating Files store')
                 db.createObjectStore(FileStores.Files, { keyPath: "uuid" });
