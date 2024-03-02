@@ -4,7 +4,7 @@ import { Search, SlidersHorizontal } from "lucide-react";
 import Settings from "./settings/Settings";
 export default function UtilityBar() {
   return (
-    <div className="flex flex-row items-center w-full gap-4">
+    <div className="flex flex-row items-center w-full h-[60px] gap-4">
       <div className="flex flex-row items-center gap-1 w-72">
         <Image
           src={Logo}
