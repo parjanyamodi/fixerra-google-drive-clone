@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Logo from "@/app/assets/google-drive-logo.jpeg";
-import { Search, Settings, SlidersHorizontal } from "lucide-react";
+import { Search, SlidersHorizontal } from "lucide-react";
+import Settings from "./settings/Settings";
 export default function UtilityBar() {
   return (
     <div className="flex flex-row items-center w-full gap-4">
@@ -29,9 +30,7 @@ export default function UtilityBar() {
         </div>
       </div>
       <div className="flex flex-row gap-4">
-        <button className="aspect-square p-2 hover:bg-gray-300 rounded-full h-fit w-fit">
-          <Settings className="p-0.5" />
-        </button>
+        <Settings />
       </div>
     </div>
   );
