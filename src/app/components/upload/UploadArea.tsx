@@ -29,18 +29,6 @@ export default function UploadArea() {
           <DropdownMenuSeparator />
 
           <UploadFiles />
-
-          <DropdownMenuItem className="flex flex-row gap-4 rounded-md" asChild>
-            <button
-              className="w-full"
-              onClick={(e) => {
-                e.preventDefault();
-              }}
-            >
-              <FolderUp size={"20"} />
-              Upload Folder
-            </button>
-          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </div>

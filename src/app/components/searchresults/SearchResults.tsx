@@ -44,6 +44,7 @@ import { fileDetails } from "@/app/utils/file";
 import { Button } from "@/components/ui/button";
 import { useAppSelector } from "@/app/redux/store";
 import { useDispatch } from "react-redux";
+import { convertEpochToIST, convertFileSize } from "@/app/utils/conversions";
 function FileMenu({
   file,
   viewType,
@@ -166,11 +167,13 @@ function ListView({ fileTree }: { fileTree: FileTree }) {
                   </TableCell>
                   <TableCell>
                     <p className="text-sm font-normal">
-                      {fileDetails.lastModified}
+                      {convertEpochToIST(fileDetails.lastModified)}
                     </p>
                   </TableCell>
                   <TableCell>
-                    <p className="text-sm font-normal">{fileDetails.size}</p>
+                    <p className="text-sm font-normal">
+                      {convertFileSize(fileDetails.size)}
+                    </p>
                   </TableCell>
                   <TableCell className="justify-end p-0">
                     <FileMenu file={fileDetails} viewType="list" />
