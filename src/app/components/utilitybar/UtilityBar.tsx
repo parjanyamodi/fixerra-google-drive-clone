@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import Logo from "@/app/assets/google-drive-logo.jpeg";
+
 import { Search, SlidersHorizontal } from "lucide-react";
 import Settings from "./settings/Settings";
 import { useAppSelector } from "@/app/redux/store";
@@ -56,13 +56,6 @@ export default function UtilityBar() {
   return (
     <div className="flex flex-row items-center w-full h-[60px] gap-4">
       <div className="flex flex-row items-center gap-1 w-72">
-        <Image
-          src={Logo}
-          alt="Logo"
-          width={60}
-          height={60}
-          className="mix-blend-darken"
-        />
         <p className="text-xl text-gray-600 font-medium ">Drive</p>
       </div>
       <div className="flex flex-row w-full">
