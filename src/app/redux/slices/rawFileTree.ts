@@ -1,7 +1,9 @@
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-const initialState: FileTree = {};
+const initialState: FileTree = {
+
+};
 
 export const rawFileTreeSlice = createSlice({
     name: 'rawFileTree',

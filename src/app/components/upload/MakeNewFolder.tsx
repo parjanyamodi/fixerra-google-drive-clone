@@ -19,6 +19,8 @@ export default function MakeNewFolder() {
   const rawFileTree = useAppSelector((state) => state.rawFileTree);
   const dispatch = useDispatch();
 
+  const currentPosition = useAppSelector((state) => state.currentPosition);
+
   const newFolderNameRef =
     useRef<HTMLInputElement>() as React.RefObject<HTMLInputElement>;
 
@@ -55,9 +57,16 @@ export default function MakeNewFolder() {
             className="text-blue-600 hover:bg-blue-50 hover:text-blue-700"
             variant={"ghost"}
             onClick={() => {
+              let tempRawFileTree = structuredClone(rawFileTree);
+              let newTempFileTree = tempRawFileTree;
+              for (let i = 0; i < currentPosition.activeDirectory.length; i++) {
+                newTempFileTree = newTempFileTree[
+                  currentPosition.activeDirectory[i] as string
+                ] as FileTree;
+              }
               if (
                 rawFileTree &&
-                Object.keys(rawFileTree).includes(
+                Object.keys(newTempFileTree).includes(
                   newFolderNameRef.current?.value as string
                 )
               ) {
@@ -65,14 +74,11 @@ export default function MakeNewFolder() {
               } else if (newFolderNameRef.current?.value === "") {
                 toast.error("Folder name cannot be empty");
               } else {
-                dispatch(
-                  setRawFileTree({
-                    ...rawFileTree,
-                    [newFolderNameRef.current?.value as string]: {
-                      files: [],
-                    },
-                  })
-                );
+                newTempFileTree[newFolderNameRef.current?.value as string] = {
+                  files: [],
+                };
+                console.log(tempRawFileTree);
+                dispatch(setRawFileTree(tempRawFileTree));
 
                 toast.success("Folder created");
               }

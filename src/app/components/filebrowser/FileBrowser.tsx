@@ -40,6 +40,11 @@ import {
 import { fileDetails } from "@/app/utils/file";
 import { Button } from "@/components/ui/button";
 import { useAppSelector } from "@/app/redux/store";
+import { useDispatch } from "react-redux";
+import {
+  setActiveDirectory,
+  setCurrentFileTree,
+} from "@/app/redux/slices/currentPositionSlice";
 function FileMenu({
   file,
   viewType,
@@ -110,8 +115,18 @@ function FileCard({ file }: { file: FileDetails }) {
   );
 }
 function FolderCard({ folderName }: { folderName: string }) {
+  const currentPosition = useAppSelector((state) => state.currentPosition);
+  const dispatch = useDispatch();
+
   return (
-    <div className="flex-1 shrink-0 w-fit max-w-[250px] border-none shadow-none bg-slate-100 hover:bg-slate-200 rounded-xl">
+    <div
+      className="flex-1 shrink-0 w-fit max-w-[250px] border-none shadow-none bg-slate-100 hover:bg-slate-200 rounded-xl"
+      onClick={() => {
+        dispatch(
+          setActiveDirectory([...currentPosition.activeDirectory, folderName])
+        );
+      }}
+    >
       <div className="flex flex-row justify-between items-center py-2 px-4">
         <div className="flex flex-row gap-3 items-center">
           <Folder size={"18"} />
@@ -134,7 +149,7 @@ function CardView({ fileTree }: { fileTree: FileTree }) {
               {Object.keys(fileTree)
                 .filter((keyName) => keyName !== "files")
                 .map((treeKey: string) => (
-                  <FolderCard folderName={treeKey} />
+                  <FolderCard folderName={treeKey} key={treeKey} />
                 ))}
             </div>
           </>
@@ -155,6 +170,8 @@ function CardView({ fileTree }: { fileTree: FileTree }) {
   );
 }
 function ListView({ fileTree }: { fileTree: FileTree }) {
+  const currentPosition = useAppSelector((state) => state.currentPosition);
+  const dispatch = useDispatch();
   return (
     <div className="flex flex-col w-full px-4">
       <Table>
@@ -170,13 +187,23 @@ function ListView({ fileTree }: { fileTree: FileTree }) {
           {fileTree &&
             Object.keys(fileTree)
               ?.filter((keyName) => keyName !== "files")
-              ?.map((treeKey: string) => (
-                <TableRow key={treeKey}>
+              ?.map((folderName: string) => (
+                <TableRow
+                  key={folderName}
+                  onClick={() => {
+                    dispatch(
+                      setActiveDirectory([
+                        ...currentPosition.activeDirectory,
+                        folderName,
+                      ])
+                    );
+                  }}
+                >
                   <TableCell className="py-0">
                     <div className="flex flex-row gap-4 items-center">
                       <Folder size={"18"} />
                       <p className="text-sm font-normal line-clamp-1">
-                        {treeKey}
+                        {folderName}
                       </p>
                     </div>
                   </TableCell>
@@ -226,11 +253,30 @@ function ListView({ fileTree }: { fileTree: FileTree }) {
 export default function FileBrowser() {
   const rawFileTree = useAppSelector((state) => state.rawFileTree);
   const [selectedView, setSelectedView] = useState<"list" | "grid">("list");
+  const currentPosition = useAppSelector((state) => state.currentPosition);
+  const dispatch = useDispatch();
+  useEffect(() => {
+    if (currentPosition.activeDirectory.length > 0) {
+      let tempFileTree = rawFileTree;
+      currentPosition.activeDirectory.forEach((directory) => {
+        tempFileTree = tempFileTree[directory] as FileTree;
+      });
+      dispatch(setCurrentFileTree(tempFileTree));
+    } else {
+      dispatch(setCurrentFileTree(rawFileTree));
+    }
+  }, [currentPosition.activeDirectory, rawFileTree]);
+
   return (
     <ScrollArea className="flex flex-col w-full h-content rounded-2xl bg-white">
       <div className="flex flex-row items-center justify-between p-4">
         <div className="flex flex-row gap-4">
-          <p>Current Folder</p>
+          <p>
+            My Drive {"> "}
+            {currentPosition.activeDirectory.map((folderName) => {
+              return `${folderName} > `;
+            })}
+          </p>
         </div>
 
         <div className="flex flex-row ">
@@ -253,8 +299,12 @@ export default function FileBrowser() {
         </div>
       </div>
 
-      {selectedView === "list" && <ListView fileTree={rawFileTree} />}
-      {selectedView === "grid" && <CardView fileTree={rawFileTree} />}
+      {selectedView === "list" && (
+        <ListView fileTree={currentPosition.currentFileTree} />
+      )}
+      {selectedView === "grid" && (
+        <CardView fileTree={currentPosition.currentFileTree} />
+      )}
     </ScrollArea>
   );
 }
