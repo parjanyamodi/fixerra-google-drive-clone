@@ -334,7 +334,7 @@ export default function FileLister() {
   const searchedAndSorted = useAppSelector((state) => state.searchedAndSorted);
   const dispatch = useDispatch();
   return (
-    <ScrollArea className="flex flex-col w-full h-content rounded-2xl bg-white">
+    <ScrollArea className="flex flex-col w-full h-content rounded-2xl bg-white overflow-auto ">
       <div className="flex flex-row items-center justify-between p-4">
         <div className="flex flex-row gap-4">
           <div className="flex flex-row items-center">
