@@ -11,6 +11,8 @@ import {
   ArrowUp10,
   ArrowUpAZ,
   ChevronDown,
+  ChevronRight,
+  ChevronRightCircle,
   Delete,
   Download,
   File as FileIcon,
@@ -140,7 +142,7 @@ function FolderCard({ folderName }: { folderName: string }) {
 }
 function CardView({ fileTree }: { fileTree: FileTree }) {
   return (
-    <div className="flex flex-col p-4 gap-2">
+    <div className="flex flex-col p-4 gap-2 w-full">
       {fileTree &&
         Object.keys(fileTree)?.filter((keyName) => keyName !== "files")
           ?.length > 0 && (
@@ -167,6 +169,14 @@ function CardView({ fileTree }: { fileTree: FileTree }) {
           </div>
         </>
       )}
+      {!fileTree ||
+        ((fileTree["files"] as FileDetails[])?.length === 0 &&
+          Object.keys(fileTree)?.filter((keyName) => keyName !== "files")
+            ?.length === 0 && (
+            <p className="flex flex-row w-full justify-center text-center">
+              No files in the folder
+            </p>
+          ))}
     </div>
   );
 }
@@ -277,14 +287,14 @@ export default function FileBrowser() {
               <div className="flex flex-row gap-2 items-center">
                 <Button
                   variant={"ghost"}
-                  className="flex flex-row rounded-xl justify-between gap-4"
+                  className="flex flex-row rounded-xl justify-between gap-1"
                   onClick={() => {
                     dispatch(setActiveDirectory([]));
                   }}
                 >
                   <span>My Drive</span>
                 </Button>
-                <ArrowRight size={"18"} />
+                <ChevronRight size={"18"} />
                 {currentPosition.activeDirectory.map((folderName, i) => {
                   let tempRawFileTree = structuredClone(rawFileTree);
                   let newTempFileTree = tempRawFileTree;
@@ -317,7 +327,7 @@ export default function FileBrowser() {
                         <span>{folderName}</span>
                       </Button>{" "}
                       {!(i === currentPosition.activeDirectory.length - 1) && (
-                        <ArrowRight size={"18"} />
+                        <ChevronRight size={"18"} />
                       )}
                     </Fragment>
                   ) : (
