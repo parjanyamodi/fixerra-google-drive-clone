@@ -1,4 +1,4 @@
-import FileBrowser from "./components/filebrowser/FileBrowser";
+import FileLister from "./components/searchresults/SearchResults";
 import SideBar from "./components/sidebar/SideBar";
 import UploadArea from "./components/upload/UploadArea";
 import UtilityBar from "./components/utilitybar/UtilityBar";
@@ -12,7 +12,7 @@ export default function Home() {
           <UploadArea />
           <SideBar />
         </div>
-        <FileBrowser />
+        <FileLister />
       </div>
     </main>
   );
