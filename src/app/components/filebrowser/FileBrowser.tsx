@@ -48,6 +48,8 @@ import {
   setActiveDirectory,
   setCurrentFileTree,
 } from "@/app/redux/slices/currentPositionSlice";
+import { useRouter } from "next/navigation";
+import { convertEpochToIST, convertFileSize } from "@/app/utils/conversions";
 function FileMenu({
   file,
   viewType,
@@ -244,11 +246,13 @@ function ListView({ fileTree }: { fileTree: FileTree }) {
                   </TableCell>
                   <TableCell>
                     <p className="text-sm font-normal">
-                      {fileDetails.lastModified}
+                      {convertEpochToIST(fileDetails.lastModified)}
                     </p>
                   </TableCell>
                   <TableCell>
-                    <p className="text-sm font-normal">{fileDetails.size}</p>
+                    <p className="text-sm font-normal">
+                      {convertFileSize(fileDetails.size)}
+                    </p>
                   </TableCell>
                   <TableCell className="justify-end p-0">
                     <FileMenu file={fileDetails} viewType="list" />
@@ -261,11 +265,13 @@ function ListView({ fileTree }: { fileTree: FileTree }) {
     </div>
   );
 }
+
 export default function FileBrowser() {
   const rawFileTree = useAppSelector((state) => state.rawFileTree);
   const [selectedView, setSelectedView] = useState<"list" | "grid">("list");
   const currentPosition = useAppSelector((state) => state.currentPosition);
   const dispatch = useDispatch();
+  const router = useRouter();
   useEffect(() => {
     if (currentPosition.activeDirectory.length > 0) {
       let tempFileTree = rawFileTree;
@@ -276,6 +282,7 @@ export default function FileBrowser() {
     } else {
       dispatch(setCurrentFileTree(rawFileTree));
     }
+    router.push(`/my-drive/${currentPosition.activeDirectory.join("/")}`);
   }, [currentPosition.activeDirectory, rawFileTree]);
 
   return (
@@ -308,7 +315,8 @@ export default function FileBrowser() {
                     ] as FileTree;
                   }
                   return !(i === currentPosition.activeDirectory.length - 1) ||
-                    Object?.keys(newTempFileTree)?.length === 1 ? (
+                    (newTempFileTree &&
+                      Object?.keys(newTempFileTree)?.length === 1) ? (
                     <Fragment key={folderName + i}>
                       <Button
                         variant={"ghost"}
@@ -342,25 +350,26 @@ export default function FileBrowser() {
                       </DropdownMenuTrigger>
 
                       <DropdownMenuContent className="rounded-xl">
-                        {Object?.keys(newTempFileTree)?.map(
-                          (folderName) =>
-                            folderName !== "files" && (
-                              <DropdownMenuItem
-                                key={folderName}
-                                onClick={() => {
-                                  dispatch(
-                                    setActiveDirectory([
-                                      ...currentPosition.activeDirectory,
-                                      folderName,
-                                    ])
-                                  );
-                                }}
-                                className="px-4 py-2 "
-                              >
-                                {folderName}
-                              </DropdownMenuItem>
-                            )
-                        )}
+                        {newTempFileTree &&
+                          Object?.keys(newTempFileTree)?.map(
+                            (folderName) =>
+                              folderName !== "files" && (
+                                <DropdownMenuItem
+                                  key={folderName}
+                                  onClick={() => {
+                                    dispatch(
+                                      setActiveDirectory([
+                                        ...currentPosition.activeDirectory,
+                                        folderName,
+                                      ])
+                                    );
+                                  }}
+                                  className="px-4 py-2 "
+                                >
+                                  {folderName}
+                                </DropdownMenuItem>
+                              )
+                          )}
                       </DropdownMenuContent>
                     </DropdownMenu>
                   );

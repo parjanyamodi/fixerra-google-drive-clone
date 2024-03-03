@@ -1,7 +1,7 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 
-const initialState: { searchedAndSorted: FileDetails[] } = {
-    searchedAndSorted: [],
+const initialState: { files: FileDetails[] } = {
+    files: [],
 };
 
 
@@ -10,7 +10,7 @@ export const searchedAndSortedSlice = createSlice({
     initialState,
     reducers: {
         setSearchedAndSorted: (state, action: PayloadAction<FileDetails[]>) => {
-            state.searchedAndSorted = action.payload;
+            return { ...state, files: action.payload };
         },
         resetSearchedAndSorted: () => initialState
     },
