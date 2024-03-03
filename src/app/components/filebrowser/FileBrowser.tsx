@@ -1,5 +1,5 @@
 "use client";
-import { getFiles } from "@/app/utils/db";
+import { getFile, getFiles } from "@/app/utils/db";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Fragment, useEffect, useState } from "react";
 
@@ -40,7 +40,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import { fileDetails } from "@/app/utils/file";
+import { downloadUint8ArrayAsFile, fileDetails } from "@/app/utils/file";
 import { Button } from "@/components/ui/button";
 import { useAppSelector } from "@/app/redux/store";
 import { useDispatch } from "react-redux";
@@ -61,15 +61,18 @@ function FileMenu({
     <div className="flex flex-row gap-1 group justify-end items-center">
       {viewType === "list" && (
         <div className="flex flex-row gap-0.5 justify-end items-center">
-          <button className="aspect-square p-2 hover:bg-gray-300 rounded-full h-fit w-fit invisible group-hover:visible">
+          <button
+            className="aspect-square p-2 hover:bg-gray-300 rounded-full h-fit w-fit invisible group-hover:visible"
+            onClick={() => {
+              getFile(file.uuid).then((fileData) => {
+                downloadUint8ArrayAsFile(fileData.data, file.name, file.type);
+              });
+            }}
+          >
             <Download size={"16"} />
           </button>
           <button className="aspect-square p-2 hover:bg-gray-300 rounded-full h-fit w-fit invisible group-hover:visible">
             <PenLine size={"16"} />
-          </button>
-
-          <button className="aspect-square p-2 hover:bg-gray-300 rounded-full h-fit w-fit invisible group-hover:visible">
-            <Star size={"16"} />
           </button>
         </div>
       )}
@@ -84,11 +87,21 @@ function FileMenu({
           side={viewType === "list" ? "right" : "bottom"}
           sideOffset={10}
         >
-          <DropdownMenuItem>Download</DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <button
+              className="w-full"
+              onClick={() => {
+                getFile(file.uuid).then((fileData) => {
+                  downloadUint8ArrayAsFile(fileData.data, file.name, file.type);
+                });
+              }}
+            >
+              Download
+            </button>
+          </DropdownMenuItem>
           <DropdownMenuItem>Rename</DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem>File Information</DropdownMenuItem>
-          <DropdownMenuItem>Delete</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </div>
