@@ -1,6 +1,9 @@
+import { setRawFileTree } from "@/app/redux/slices/rawFileTree";
+import { useAppSelector } from "@/app/redux/store";
 import { addFile } from "@/app/utils/db";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { FileUp } from "lucide-react";
+import { useDispatch } from "react-redux";
 import { v4 } from "uuid";
 
 export default function UploadFiles() {
@@ -16,18 +19,39 @@ export default function UploadFiles() {
       reader.readAsArrayBuffer(file);
     });
   };
+  const currentPosition = useAppSelector((state) => state.currentPosition);
+  const rawFileTree = useAppSelector((state) => state.rawFileTree);
+  const dispatch = useDispatch();
   const handleAddFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
+
     if (files) {
+      let tempRawFileTree = structuredClone(rawFileTree);
+      let newTempFileTree = tempRawFileTree;
+
+      for (let i = 0; i < currentPosition.activeDirectory.length; i++) {
+        newTempFileTree = newTempFileTree[
+          currentPosition.activeDirectory[i] as string
+        ] as FileTree;
+      }
+
       for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-        addFile({
-          name: file.name,
-          size: file.size,
-          type: file.type,
-          lastModified: file.lastModified,
+        const fileMetaData: FileDetails = {
           uuid: v4(),
-          data: await readFileAsBuffer(file),
+          name: files[i].name,
+          size: files[i].size,
+          type: files[i].type,
+          lastModified: files[i].lastModified,
+          uploadedAt: Date.now(),
+        };
+        if (!newTempFileTree["files"]) {
+          newTempFileTree["files"] = [];
+        }
+        (newTempFileTree["files"] as FileDetails[]).push(fileMetaData);
+        dispatch(setRawFileTree(tempRawFileTree));
+        addFile({
+          uuid: fileMetaData.uuid,
+          data: await readFileAsBuffer(files[i]),
         });
       }
     }

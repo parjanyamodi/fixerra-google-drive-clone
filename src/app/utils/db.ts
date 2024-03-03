@@ -3,15 +3,6 @@ import { toast } from "sonner";
 let request: IDBOpenDBRequest;
 let db: IDBDatabase;
 let version = 1;
-export interface File {
-    uuid: string;
-    name: string;
-    type: string;
-    lastModified: number;
-    size: number;
-    dateCreated?: number;
-    data: Uint8Array;
-}
 
 export enum FileStores {
     Files = "files",
@@ -40,7 +31,7 @@ export const initDB = async (): Promise<boolean> => {
     });
 }
 
-export const addFile = async (fileData: File) => {
+export const addFile = async (fileData: FileData) => {
     console.log(fileData);
     return new Promise((resolve, reject) => {
         request = indexedDB.open("fileDB", version);
@@ -52,7 +43,7 @@ export const addFile = async (fileData: File) => {
             response.onsuccess = (event) => {
 
                 toast.success("File added successfully", {
-                    description: fileData.name,
+                    description: fileData.uuid,
 
                 });
                 resolve(true);
@@ -61,14 +52,14 @@ export const addFile = async (fileData: File) => {
         };
         request.onerror = (event) => {
             toast.error("Error adding file", {
-                description: fileData.name,
+                description: fileData.uuid,
             });
             reject(false);
         };
     });
 }
 
-export const getFile = async (uuid: string): Promise<File> => {
+export const getFile = async (uuid: string): Promise<FileData> => {
     request = indexedDB.open("fileDB", version);
     return new Promise((resolve, reject) => {
         request.onsuccess = (event) => {
@@ -95,7 +86,7 @@ export const getFile = async (uuid: string): Promise<File> => {
     });
 }
 
-export const getFiles = async (): Promise<File[]> => {
+export const getFiles = async (): Promise<FileData[]> => {
     return new Promise((resolve, reject) => {
         request = indexedDB.open("fileDB", version);
         request.onsuccess = (event) => {
