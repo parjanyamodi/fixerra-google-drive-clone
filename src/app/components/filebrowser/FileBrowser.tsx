@@ -1,12 +1,13 @@
 "use client";
 import { getFiles } from "@/app/utils/db";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 
 import {
   AlignJustify,
   ArrowDown01,
   ArrowDownAZ,
+  ArrowRight,
   ArrowUp10,
   ArrowUpAZ,
   ChevronDown,
@@ -271,12 +272,119 @@ export default function FileBrowser() {
     <ScrollArea className="flex flex-col w-full h-content rounded-2xl bg-white">
       <div className="flex flex-row items-center justify-between p-4">
         <div className="flex flex-row gap-4">
-          <p>
-            My Drive {"> "}
-            {currentPosition.activeDirectory.map((folderName) => {
-              return `${folderName} > `;
-            })}
-          </p>
+          <div className="flex flex-row items-center">
+            {currentPosition.activeDirectory.length > 0 ? (
+              <div className="flex flex-row gap-2 items-center">
+                <Button
+                  variant={"ghost"}
+                  className="flex flex-row rounded-xl justify-between gap-4"
+                  onClick={() => {
+                    dispatch(setActiveDirectory([]));
+                  }}
+                >
+                  <span>My Drive</span>
+                </Button>
+                <ArrowRight size={"18"} />
+                {currentPosition.activeDirectory.map((folderName, i) => {
+                  let tempRawFileTree = structuredClone(rawFileTree);
+                  let newTempFileTree = tempRawFileTree;
+                  for (
+                    let i = 0;
+                    i < currentPosition.activeDirectory.length;
+                    i++
+                  ) {
+                    newTempFileTree = newTempFileTree[
+                      currentPosition.activeDirectory[i] as string
+                    ] as FileTree;
+                  }
+                  return !(i === currentPosition.activeDirectory.length - 1) ||
+                    Object?.keys(newTempFileTree)?.length === 1 ? (
+                    <Fragment key={folderName + i}>
+                      <Button
+                        variant={"ghost"}
+                        className="flex flex-row rounded-xl justify-between gap-4"
+                        onClick={() => {
+                          dispatch(
+                            setActiveDirectory([
+                              ...currentPosition.activeDirectory.slice(
+                                0,
+                                i + 1
+                              ),
+                            ])
+                          );
+                        }}
+                      >
+                        <span>{folderName}</span>
+                      </Button>{" "}
+                      {!(i === currentPosition.activeDirectory.length - 1) && (
+                        <ArrowRight size={"18"} />
+                      )}
+                    </Fragment>
+                  ) : (
+                    <DropdownMenu key={folderName + i}>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant={"ghost"}
+                          className="flex flex-row rounded-xl justify-between gap-4"
+                        >
+                          <span>{folderName}</span> <ChevronDown size={"18"} />
+                        </Button>
+                      </DropdownMenuTrigger>
+
+                      <DropdownMenuContent className="rounded-xl">
+                        {Object?.keys(newTempFileTree)?.map(
+                          (folderName) =>
+                            folderName !== "files" && (
+                              <DropdownMenuItem
+                                key={folderName}
+                                onClick={() => {
+                                  dispatch(
+                                    setActiveDirectory([
+                                      ...currentPosition.activeDirectory,
+                                      folderName,
+                                    ])
+                                  );
+                                }}
+                                className="px-4 py-2 "
+                              >
+                                {folderName}
+                              </DropdownMenuItem>
+                            )
+                        )}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  );
+                })}
+              </div>
+            ) : (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant={"ghost"}
+                    className="flex flex-row rounded-xl justify-between gap-4"
+                  >
+                    <span>My Drive</span> <ChevronDown size={"18"} />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="rounded-xl">
+                  {Object.keys(rawFileTree)?.map(
+                    (folderName, i) =>
+                      folderName !== "files" && (
+                        <DropdownMenuItem
+                          key={folderName + i}
+                          onClick={() => {
+                            dispatch(setActiveDirectory([folderName]));
+                          }}
+                          className="px-4 py-2 "
+                        >
+                          {folderName}
+                        </DropdownMenuItem>
+                      )
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+          </div>
         </div>
 
         <div className="flex flex-row ">
