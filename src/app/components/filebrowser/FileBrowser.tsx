@@ -50,6 +50,13 @@ import {
 } from "@/app/redux/slices/currentPositionSlice";
 import { useRouter } from "next/navigation";
 import { convertEpochToIST, convertFileSize } from "@/app/utils/conversions";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
+import { Badge } from "@/components/ui/badge";
+
 function FileMenu({
   file,
   viewType,
@@ -101,7 +108,41 @@ function FileMenu({
           </DropdownMenuItem>
           <DropdownMenuItem>Rename</DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem>File Information</DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <HoverCard>
+              <HoverCardTrigger asChild>
+                <Button variant="link">File Information</Button>
+              </HoverCardTrigger>
+              <HoverCardContent
+                className="min-w-[500px] w-fit"
+                side="left"
+                sideOffset={10}
+              >
+                <div className="flex justify-between space-x-4">
+                  <div className="space-y-1">
+                    <h4 className="text-sm font-semibold">{file.name}</h4>
+                    <div className="flex text-sm gap-2">
+                      <Badge variant="default">
+                        {convertFileSize(file.size)}
+                      </Badge>
+                      {file.type && (
+                        <Badge variant="secondary">{file.type}</Badge>
+                      )}
+                    </div>
+                    <div className="flex flex-col items-start justify-between pt-2">
+                      <span className="text-xs text-muted-foreground">
+                        Uploaded At :- {convertEpochToIST(file.uploadedAt)}
+                      </span>
+                      <span className="text-xs text-muted-foreground">
+                        Last Modified At :-{" "}
+                        {convertEpochToIST(file.lastModified)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </HoverCardContent>
+            </HoverCard>
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </div>
