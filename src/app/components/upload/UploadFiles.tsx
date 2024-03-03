@@ -22,10 +22,6 @@ export default function UploadFiles() {
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
         addFile({
-          name: file.name,
-          size: file.size,
-          type: file.type,
-          lastModified: file.lastModified,
           uuid: v4(),
           data: await readFileAsBuffer(file),
         });
